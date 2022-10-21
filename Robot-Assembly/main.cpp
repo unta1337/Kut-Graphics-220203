@@ -4,10 +4,14 @@
 #include "draw.hpp"
 #include "util.hpp"
 #include "mesh.hpp"
+#include "robot.hpp"
 
 #define FILTER_ASE L"ASE 3D data (*.ase)\0*.ase\0All (*.*)\0*.*\0"
 
-static Mesh obj3D;
+static Mesh object;
+static Robot robot(300, true);
+
+static bool showObject = true;
 
 void display()
 {
@@ -15,7 +19,10 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     setMaterialColor(1, 1, 1, 1);
-    obj3D.draw(250, true);
+    if (showObject)
+		object.draw(300, true);
+    else
+		robot.draw();
     glutSwapBuffers();
 
     glFlush();
@@ -30,8 +37,11 @@ void keyboard(unsigned char key, int x, int y)
     case 'l':
         fileName = fileDlg(FILTER_ASE);
         if (fileName != NULL)
-            obj3D.readASE(fileName);
-		break;
+            object.readASE(fileName);
+        break;
+    case 'k':
+        showObject = !showObject;
+        break;
     case 'i':
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -108,7 +118,7 @@ int main(int argc, char* argv[])
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
     glutInitWindowSize(600, 600);
-    glutCreateWindow("Geometric Transform");
+    glutCreateWindow("Robot Assembly");
 
     glutDisplayFunc(display);
 

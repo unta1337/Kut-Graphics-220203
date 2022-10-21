@@ -122,10 +122,6 @@ public:
 					sscanf(line, "%s", str);
 				}
 
-				printf("%s\n", str);
-				printf("%s\n", str + 1);
-				printf("%s\n", str + 2);
-
 				if (strcmp(str, "*MESH_NORMALS") == 0)
 				{
 					for (int i = 0; i < nFace; i++)
@@ -150,6 +146,8 @@ public:
 				break;
 			}
 		}
+
+		wprintf(L"\"%s\" has been loaded.\n", fileName);
 
 		fclose(fp);
 	}
@@ -176,6 +174,21 @@ public:
 
 		if (bCoord)
 			drawCoord(1);
+	}
+
+	void drawColor4fv(float color[4], float scale = 1.0f, bool bCoord = false)
+	{
+		setColor(color[0], color[1], color[2], color[3]);
+
+		draw(scale, bCoord);
+	}
+
+	void setColor(float red, float green, float blue, float alpha)
+	{
+		float color[4] = { red, green, blue, alpha };
+
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
 	}
 };
 
