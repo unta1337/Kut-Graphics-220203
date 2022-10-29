@@ -10,8 +10,8 @@
 #include "Robot.h"
 
 #include "DefaultAnimation.h"
-#include "Dab.h"
 #include "RunAnimation.h"
+#include "Dab.h"
 
 #define FILTER_ASE L"ASE 3D data (*.ase)\0*.ase\0All (*.*)\0*.*\0"
 
@@ -24,6 +24,14 @@ extern int gTime = 0;
 static int gTimeInterval = 10;
 static int gTimeIntervalMS = 10;
 static bool doTimeFlow = false;
+
+static IAnimation* animations[] =
+{
+    new DefaultAnimation,
+    new RunAnimation,
+    new Dab
+};
+static int iAnimation = 1;
 
 void display()
 {
@@ -69,6 +77,11 @@ void keyboard(unsigned char key, int x, int y)
     case 'r':
         doTimeFlow = !doTimeFlow;
         break;
+    case 'n':
+        gTime = 0;
+        iAnimation = (iAnimation + 1) % (sizeof(animations) / sizeof(animations[0]));
+		robot.setAnimation(animations[iAnimation]);
+		break;
     case 'q':
         exit(0);
     }
@@ -101,7 +114,7 @@ void mouseMotion(GLint x, GLint y)
 void updateTime(int value)
 {
     gTime += gTimeInterval * doTimeFlow;
-    gTime %= 360;
+    gTime %= 10 * 360;
 
     glutTimerFunc(gTimeIntervalMS, updateTime, 1);
 }
@@ -138,7 +151,7 @@ int main(int argc, char* argv[])
 {
     setlocale(LC_ALL, "KOREAN");
 
-	robot.setAnimation(new RunAnimation);
+	robot.setAnimation(animations[iAnimation]);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);

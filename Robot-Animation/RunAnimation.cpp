@@ -66,7 +66,6 @@ void RunAnimation::animateLeftFoot()
 	DefaultAnimation::animateLeftFoot();
 
 	glRotatef(-50 * sinDeg(gTime) - 55, 1, 0, 0);
-	glRotatef(-gTime / 20.0, 0, -1, 0);
 }
 
 void RunAnimation::animateRightLeg()
@@ -81,5 +80,4 @@ void RunAnimation::animateRightFoot()
 	DefaultAnimation::animateRightFoot();
 
 	glRotatef(50 * sinDeg(gTime) - 55, 1, 0, 0);
-	glRotatef(gTime / 20.0, 0, -1, 0);
 }
