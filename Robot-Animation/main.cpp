@@ -15,8 +15,11 @@
 
 #define FILTER_ASE L"ASE 3D data (*.ase)\0*.ase\0All (*.*)\0*.*\0"
 
+static const int initialWidth = 600;
+static const int initialHeight = 600;
+
 static Mesh object;
-static Robot robot(300, true);
+static Robot robot(300, false);
 
 static bool showObject = true;
 
@@ -35,14 +38,85 @@ static int iAnimation = 1;
 
 void display()
 {
-    glClearColor(0.99, 0.97, 0.97, 1.0);
+    int width = glutGet(GLUT_WINDOW_WIDTH);
+    int height = glutGet(GLUT_WINDOW_HEIGHT);
+
+    glClearColor(0.2, 0.2, 0.2, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     setMaterialColor(1, 1, 1, 1);
     if (showObject)
 		object.draw(300, true);
     else
-		robot.draw();
+    {
+        // ÁÂ»ó´Ü, »ó´Üºä.
+        glViewport(0, height / 2.0, width / 2.0, height / 2.0);
+        glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(
+            -1, 1, -1, 1, 0, 10
+		);
+		glMatrixMode(GL_MODELVIEW);
+        gluLookAt(
+            0, 1, 0,
+            0, 0, 0,
+			0, 0, 1
+        );
+        robot.draw();
+        glPopMatrix();
+
+        // ¿ì»ó´Ü, Frustum.
+        glViewport(width / 2.0, height / 2.0, width / 2.0, height / 2.0);
+        glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glFrustum(
+            -1, 1, -1, 1, 0, 10
+		);
+		glMatrixMode(GL_MODELVIEW);
+        gluLookAt(
+            0.1, -0.1, 0.1, 
+			0, 0, 0, 
+			0, 1, 0
+        );
+        robot.draw();
+        glPopMatrix();
+
+        // ÁÂÇÏ´Ü, Á¤¸éºä.
+        glViewport(0, 0, width/ 2.0, height / 2.0);
+        glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(
+            -1, 1, -1, 1, 0, 10
+		);
+		glMatrixMode(GL_MODELVIEW);
+        gluLookAt(
+            0, 0, -1,
+            0, 0, 0,
+			0, 1, 0
+        );
+        robot.draw();
+        glPopMatrix();
+
+        // ¿ìÇÏ´Ü, Ãø¸éºä.
+        glViewport(width / 2.0, 0, width / 2.0, height / 2.0);
+        glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(
+            -1, 1, -1, 1, 0, 10
+		);
+		glMatrixMode(GL_MODELVIEW);
+        gluLookAt(
+            1, 0, 0,
+            0, 0, 0,
+			0, 1, 0
+        );
+        robot.draw();
+        glPopMatrix();
+    }
     glutSwapBuffers();
 
     glFlush();
@@ -103,12 +177,27 @@ void mouseClick(int button, int state, int x, int y)
 
 void mouseMotion(GLint x, GLint y)
 {
-    glMatrixMode(GL_MODELVIEW);
-    glRotated((GLdouble)x - prevX, 0, -1, 0);
-    glRotated((GLdouble)y - prevY, -1, 0, 0);
-	prevX = x;
-	prevY = y;
-    glutPostRedisplay();
+    // glMatrixMode(GL_MODELVIEW);
+    // glRotated((GLdouble)x - prevX, 0, -1, 0);
+    // glRotated((GLdouble)y - prevY, -1, 0, 0);
+	// prevX = x;
+	// prevY = y;
+
+    // if mouse is on right bottom
+	// if (x > glutGet(GLUT_WINDOW_WIDTH) / 2.0 && y < glutGet(GLUT_WINDOW_HEIGHT) / 2.0)
+	// {
+    //     robot.setScale(200);
+	// }
+	// else
+	// {
+	// 	glMatrixMode(GL_MODELVIEW);
+	// 	glRotated((GLdouble)x - prevX, 0, -1, 0);
+	// 	glRotated((GLdouble)y - prevY, -1, 0, 0);
+	// 	prevX = x;
+	// 	prevY = y;
+	// }
+
+    // glutPostRedisplay();
 }
 
 void updateTime(int value)
@@ -147,6 +236,21 @@ void initRendering()
     glShadeModel(GL_SMOOTH);
 }
 
+void reshape(int width, int height)
+{
+    glViewport(0, 0, width / 2.0, height / 2.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(
+        -1 * (width / (double)initialWidth),
+         1 * (width / (double)initialWidth),
+        -1 * (height / (double)initialHeight),
+         1 * (height / (double)initialHeight),
+        10, -10
+    );
+    glMatrixMode(GL_MODELVIEW);
+}
+
 int main(int argc, char* argv[]) 
 {
     setlocale(LC_ALL, "KOREAN");
@@ -155,19 +259,22 @@ int main(int argc, char* argv[])
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-    glutInitWindowSize(600, 600);
+    glutInitWindowSize(initialWidth, initialHeight);
     glutCreateWindow("Robot Animation");
 
     glutDisplayFunc(display);
+    // glutReshapeFunc(reshape);
 
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouseClick);
     glutMotionFunc(mouseMotion);
+
     glutTimerFunc(gTimeIntervalMS, updateTime, 1);
 
     initRendering();
     keyboard('k', 0, 0);
 
     glutMainLoop();
+
     return 0;
 }
