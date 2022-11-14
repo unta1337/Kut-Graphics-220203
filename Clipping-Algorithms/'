@@ -110,7 +110,7 @@ int getRegion(double x, double y)
 
 bool cohenSutherlandLineClip()
 {
-	memcpy(theLine2, theLine[theLineIndex], 6 * sizeof(double));
+	memcpy(theLine2, theLine + 6 * theLineIndex, 6 * sizeof(double));
 
 	int begin = getRegion(theLine2[0], theLine2[1]);
 	int end = getRegion(theLine2[3], theLine2[4]);
@@ -204,7 +204,7 @@ int clipTest(double p, double q, double* t1, double* t2)
   
 void liangBarskyLineClip()
 {
-	memcpy(theLine2, theLine[theLineIndex], 6 * sizeof(double));
+	memcpy(theLine2, theLine + 6 * theLineIndex, 6 * sizeof(double));
 
 	double t1 = 0.0, t2 = 1.0, dx = theLine2[3] - theLine2[0], dy;
 
@@ -237,22 +237,22 @@ void liangBarskyLineClip()
 
 void lineClipTest()
 {
-	std::cout << "¿ø¼±ºÐ: " <<
-		"(" << theLine[theLineIndex][0] << ", " << theLine[theLineIndex][1] << ")" << ", " <<
+	std::cout << "ì›ì„ ë¶„: " <<
+		"(" << theLine[theLineIndex][0] << ", " << theLine[theLineIndex][1] << ")" <<
 		"(" << theLine[theLineIndex][3] << ", " << theLine[theLineIndex][4] << ")" <<
 		"\n";
 
 	cohenSutherlandLineClip();
-	std::cout << "¹æ¹ý 1: " <<
-		"(" << theLine2[0] << ", " << theLine2[1] << ")" << ", " <<
+	std::cout << "ë°©ë²• 1: " <<
+		"(" << theLine2[0] << ", " << theLine2[1] << ")" <<
 		"(" << theLine2[3] << ", " << theLine2[4] << ")" <<
 		"\n";
 
 	liangBarskyLineClip();
-	std::cout << "¹æ¹ý 2: " <<
-		"(" << theLine2[0] << ", " << theLine2[1] << ")" << ", " <<
+	std::cout << "ë°©ë²• 2: " <<
+		"(" << theLine2[0] << ", " << theLine2[1] << ")" <<
 		"(" << theLine2[3] << ", " << theLine2[4] << ")" <<
-		"\n\n";
+		"\n";
 }
 
 void show()
@@ -281,17 +281,16 @@ void handleKeyboardInput(unsigned char key, int x, int y)
 	case 'l':
 		theLineIndex += 1;
 		theLineIndex %= theLineSize;
+		lineClipTest();
 		break;
 	case 'm':
 		clipFuncIndex += 1;
 		clipFuncIndex %= clipFuncSize;
-		std::cout << "[Ç¥½ÃµÇ´Â Àý´Ü ¾Ë°í¸®Áò] " << (clipFuncIndex == 0 ? "Cohen-Sutherland" : "Liang-Barsky") << "\n";
 		break;
 	case 'q':
 		exit(0);
 	}
 
-	lineClipTest();
 	clipFunc[clipFuncIndex]();
 	glutPostRedisplay();
 }
